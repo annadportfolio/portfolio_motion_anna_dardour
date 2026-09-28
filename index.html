@@ -8,7 +8,15 @@
 </head>
 <body>
   <div class="hud title">Portfolio Anna Dardour</div>
-  <div id="lightbox"><button id="lightbox-close" title="Fermer (Échap)">&#10005;</button></div>
+  <div id="lightbox">
+    <div id="lightbox-bar">
+      <button id="lb-play" type="button" aria-label="Lecture / pause"></button>
+      <input id="lb-seek" type="range" min="0" max="1000" value="0" step="1" aria-label="Position" />
+      <span id="lb-time">0:00 / 0:00</span>
+      <button id="lb-mute" type="button" aria-label="Son"></button>
+    </div>
+    <button id="lightbox-close" title="Fermer (Échap)">&#10005;</button>
+  </div>
   <div id="picker">
     <div class="picker-box">
       <p class="picker-title">Portfolio Anna Dardour</p>

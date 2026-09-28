@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Portfolio Anna Dardour</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="hud title">Portfolio Anna Dardour</div>
+  <div id="lightbox"><button id="lightbox-close" title="Fermer (Échap)">&#10005;</button></div>
+  <div id="picker">
+    <div class="picker-box">
+      <p class="picker-title">Portfolio Anna Dardour</p>
+      <p class="picker-text">Site ouvert en local : le navigateur demande de choisir les vidéos pour pouvoir les afficher dans la salle 3D.</p>
+      <label class="picker-btn">
+        Choisir le dossier « videos »
+        <input type="file" id="picker-folder" webkitdirectory multiple hidden />
+      </label>
+      <label class="picker-link">
+        ou sélectionner les fichiers vidéo
+        <input type="file" id="picker-files" accept="video/*" multiple hidden />
+      </label>
+      <p class="picker-text small">Tu peux aussi glisser-déposer les 8 vidéos sur cette page.</p>
+      <p id="picker-status" class="picker-text small"></p>
+      <button id="picker-skip" type="button">Entrer sans vidéos</button>
+    </div>
+  </div>
+  <script src="js/three.js"></script>
+  <script src="js/Reflector.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

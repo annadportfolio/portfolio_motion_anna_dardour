@@ -180,6 +180,13 @@ function makeVideoTexture(file) {
   video.muted = true
   video.loop = true
   video.playsInline = true
+  // pas de bouton « télécharger », pas de PiP ni de diffusion vers un autre écran
+  video.setAttribute('controlsList', 'nodownload noplaybackrate')
+  video.disablePictureInPicture = true
+  video.disableRemotePlayback = true
+  video.draggable = false
+  // pas de menu « Enregistrer la vidéo sous… » (clic droit / appui long)
+  video.addEventListener('contextmenu', (e) => e.preventDefault())
   video.addEventListener('error', () => console.warn('Vidéo introuvable ou illisible :', video.dataset.src))
   const texture = new THREE.VideoTexture(video)
   texture.colorSpace = THREE.SRGBColorSpace
@@ -318,13 +325,14 @@ for (let i = 0; i < PANEL_COUNT; i++) {
 // fullscreen viewing: the panel's <video> element moves into the DOM overlay
 // (it keeps feeding the 3D texture), native controls give play/seek/volume
 const lightbox = document.getElementById('lightbox')
+const closeBtn = document.getElementById('lightbox-close')
 let lightboxVideo = null
 
 function openLightbox(video) {
   lightboxVideo = video
   video.controls = true
   video.muted = false
-  lightbox.appendChild(video)
+  lightbox.insertBefore(video, closeBtn) // la croix reste au-dessus de la vidéo
   lightbox.classList.add('open')
   video.play().catch(() => {})
 }
@@ -338,7 +346,13 @@ function closeLightbox() {
   lightbox.classList.remove('open')
 }
 
-document.getElementById('lightbox-close').addEventListener('click', closeLightbox)
+// click + pointerup : certains navigateurs mobiles ne déclenchent pas toujours « click »
+closeBtn.addEventListener('click', closeLightbox)
+closeBtn.addEventListener('pointerup', (e) => {
+  e.stopPropagation()
+  closeLightbox()
+})
+lightbox.addEventListener('contextmenu', (e) => e.preventDefault())
 lightbox.addEventListener('click', (e) => {
   if (e.target === lightbox) closeLightbox()
 })

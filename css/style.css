@@ -12,7 +12,7 @@ canvas { display: block; touch-action: none; }
   background: rgba(18, 17, 15, 0.93);
 }
 #lightbox.open { display: flex; }
-#lightbox video { width: 92vw; height: 86vh; object-fit: contain; }
+#lightbox video { width: 92vw; height: 86vh; object-fit: contain; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
 #lightbox-close {
   position: absolute; z-index: 5; /* au-dessus de la vidéo, sinon le doigt touche la vidéo */
   top: max(20px, env(safe-area-inset-top)); right: max(26px, env(safe-area-inset-right));

@@ -363,16 +363,11 @@ window.addEventListener('keydown', (e) => {
 
 // commandes perso : lecture/pause, barre de progression, son.
 // Le lecteur natif du navigateur (avec son menu « Télécharger ») n'est plus utilisé.
+// Tout est dans try/catch : en cas de souci, la salle 3D continue de fonctionner.
 const ICON_PLAY = '<svg viewBox="0 0 24 24"><path d="M7 4.5v15l13-7.5z"/></svg>'
 const ICON_PAUSE = '<svg viewBox="0 0 24 24"><path d="M6 4.5h4.2v15H6zM13.8 4.5H18v15h-4.2z"/></svg>'
 const ICON_SOUND = '<svg viewBox="0 0 24 24"><path d="M4 9.5v5h3.6l4.4 3.8V5.7L7.6 9.5zM15 8.6a4.6 4.6 0 0 1 0 6.8l-1.2-1.3a2.8 2.8 0 0 0 0-4.2zM17.4 6.2a8 8 0 0 1 0 11.6l-1.2-1.3a6.2 6.2 0 0 0 0-9z"/></svg>'
 const ICON_MUTED = '<svg viewBox="0 0 24 24"><path d="M4 9.5v5h3.6l4.4 3.8V5.7L7.6 9.5zM15.2 9.4l1.8 1.8 1.8-1.8 1.2 1.2-1.8 1.8 1.8 1.8-1.2 1.2-1.8-1.8-1.8 1.8-1.2-1.2 1.8-1.8-1.8-1.8z"/></svg>'
-
-const lbPlay = document.getElementById('lb-play')
-const lbSeek = document.getElementById('lb-seek')
-const lbTime = document.getElementById('lb-time')
-const lbMute = document.getElementById('lb-mute')
-let seeking = false
 
 function fmtTime(t) {
   if (!isFinite(t)) return '0:00'
@@ -385,33 +380,55 @@ function toggleLightboxPlay() {
   else lightboxVideo.pause()
 }
 
-function syncControls() {
-  const v = lightboxVideo
-  if (!v) return
-  lbPlay.innerHTML = v.paused ? ICON_PLAY : ICON_PAUSE
-  lbMute.innerHTML = v.muted ? ICON_MUTED : ICON_SOUND
-  if (!seeking && v.duration) lbSeek.value = (v.currentTime / v.duration) * 1000
-  lbTime.textContent = fmtTime(v.currentTime) + ' / ' + fmtTime(v.duration)
-}
-setInterval(syncControls, 200)
-
-lbPlay.addEventListener('click', toggleLightboxPlay)
-lbMute.addEventListener('click', () => {
-  if (lightboxVideo) lightboxVideo.muted = !lightboxVideo.muted
-  syncControls()
-})
-lbSeek.addEventListener('pointerdown', () => { seeking = true })
-window.addEventListener('pointerup', () => { seeking = false })
-lbSeek.addEventListener('input', () => {
-  const v = lightboxVideo
-  if (v && v.duration) v.currentTime = (lbSeek.value / 1000) * v.duration
-})
-window.addEventListener('keydown', (e) => {
-  if (e.code === 'Space' && lightboxVideo) {
-    e.preventDefault()
-    toggleLightboxPlay()
+try {
+  // crée la barre si elle n'existe pas déjà dans index.html
+  let bar = document.getElementById('lightbox-bar')
+  if (!bar) {
+    bar = document.createElement('div')
+    bar.id = 'lightbox-bar'
+    bar.innerHTML =
+      '<button id="lb-play" type="button" aria-label="Lecture / pause"></button>' +
+      '<input id="lb-seek" type="range" min="0" max="1000" value="0" step="1" aria-label="Position" />' +
+      '<span id="lb-time">0:00 / 0:00</span>' +
+      '<button id="lb-mute" type="button" aria-label="Son"></button>'
+    lightbox.insertBefore(bar, lightbox.firstChild)
   }
-})
+  const lbPlay = document.getElementById('lb-play')
+  const lbSeek = document.getElementById('lb-seek')
+  const lbTime = document.getElementById('lb-time')
+  const lbMute = document.getElementById('lb-mute')
+  let seeking = false
+
+  const syncControls = () => {
+    const v = lightboxVideo
+    if (!v) return
+    lbPlay.innerHTML = v.paused ? ICON_PLAY : ICON_PAUSE
+    lbMute.innerHTML = v.muted ? ICON_MUTED : ICON_SOUND
+    if (!seeking && v.duration) lbSeek.value = (v.currentTime / v.duration) * 1000
+    lbTime.textContent = fmtTime(v.currentTime) + ' / ' + fmtTime(v.duration)
+  }
+  setInterval(syncControls, 200)
+
+  lbPlay.addEventListener('click', toggleLightboxPlay)
+  lbMute.addEventListener('click', () => {
+    if (lightboxVideo) lightboxVideo.muted = !lightboxVideo.muted
+    syncControls()
+  })
+  lbSeek.addEventListener('pointerdown', () => { seeking = true })
+  window.addEventListener('pointerup', () => { seeking = false })
+  lbSeek.addEventListener('input', () => {
+    const v = lightboxVideo
+    if (v && v.duration) v.currentTime = (lbSeek.value / 1000) * v.duration
+  })
+  window.addEventListener('keydown', (e) => {
+    if (e.code === 'Space' && lightboxVideo) {
+      e.preventDefault()
+      toggleLightboxPlay()
+    }
+  })
+} catch (err) {
+  console.warn('Commandes vidéo indisponibles :', err)
+}
 
 // ---------------------------------------------------------------- local file picker
 
